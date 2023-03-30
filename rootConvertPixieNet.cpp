@@ -133,38 +133,35 @@ int main(int argc, char *argv[]) {
       adcEnergy[0] = atoi(vect[5].c_str());
       int time_h = atoi(vect[3].c_str());
       int time_l = atoi(vect[4].c_str());
-      time[0] = time_h * pow(2,32) + time_l;
+      long time[0] = time_h * pow(2,32) + time_l;
 
       //get new line
       int counter = 0;
 	
+      // Group hits into events
       while(infile){
-	getline(infile,line);
-	vect.clear();
-	split2(line,vect,',');
-	
-	time_h = atoi(vect[3].c_str());
-	time_l = atoi(vect[4].c_str());
-	long time_temp = time_h * pow(2,32) + time_l;
-	
-	if(time_temp < (eventMaxTime + time[0])){
-	    counter++;
-	    adcEnergy[counter] = atoi(vect[5].c_str());
-	    channel[counter] = atoi(vect[1].c_str());
-	    time[counter] = time_temp;
-	} else{
-	  
-	  tree1->Fill();
-	  ResetTreeVariables();
-	  counter=0;
-	  adcEnergy[counter] = atoi(vect[5].c_str());
-	  channel[counter] = atoi(vect[1].c_str());
-	  time[counter] = time_temp;
-	  
-	}
-	
-      }
+	      getline(infile,line);
+	      vect.clear();
+      	split2(line,vect,',');
 
+      	time_h = atoi(vect[3].c_str());
+      	time_l = atoi(vect[4].c_str());
+	      long time_temp = time_h * pow(2,32) + time_l;
+	
+	      if(time_temp < (eventMaxTime + time[0])){
+	        counter++;
+	        adcEnergy[counter] = atoi(vect[5].c_str());
+	        channel[counter] = atoi(vect[1].c_str());
+	        time[counter] = time_temp;
+	      } else{
+	          tree1->Fill();
+	          ResetTreeVariables();
+  	        counter=0;
+      	    adcEnergy[counter] = atoi(vect[5].c_str());
+	          channel[counter] = atoi(vect[1].c_str());
+	         time[counter] = time_temp;
+	        }
+        }
       tree1->Fill();
     }
   }
