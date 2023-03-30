@@ -23,9 +23,7 @@
 
 using namespace std;
 
-//define things
-
-//tree variables
+// TTree variables
 void ResetTreeVariables();
 	const Int_t maxhits = 40;
 

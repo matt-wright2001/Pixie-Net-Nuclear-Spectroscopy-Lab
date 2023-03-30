@@ -1,13 +1,9 @@
-//B.P. Crider - 10/11/19
-//convert GeGI data
-// Hello
-// THis is more testing
-
+// M.S. Wright, B.R. Clark, D.C. Heson, B.P. Crider, J.A. Winger
+// Convert raw XIA Pixie-Net data files into a TTree 
 
 #include "rootConvertPixieNet.h"
 
 using namespace std;
-
 
 //for stripping path and extension off of filename
 string GetFilename(string filename){
@@ -26,8 +22,8 @@ string GetFilename(string filename){
   return filename;
 }
 
-//get extension for determining the file extension only 
-//(used to discriminate between binar and ASCII files
+// Get extension for determining the file extension only 
+// Discriminate between binary and ASCII files
 string GetFileExtension(string filename){
   // Remove directory if present.
   // Do this before extension removal in case directory has a period character.
@@ -38,14 +34,11 @@ string GetFileExtension(string filename){
   
   // Get extension if present.
   const size_t period_idx = filename.rfind('.');
-  // if (std::string::npos != period_idx){
-  //   filename.erase(period_idx);
-  // }
   std::string extension = filename.substr(period_idx,std::string::npos);
   return extension;
 }
 
-//for reading strings from input file
+// Read strings from input file
 template <class Container>
 void split2(const std::string& str, Container& cont, char delim = '\t')
 {
@@ -57,31 +50,25 @@ void split2(const std::string& str, Container& cont, char delim = '\t')
     }
 }
 
-//reset the variables... all defined in rootConvertPixieNet.h
+// Reset variables defined in rootConvertPixieNet.h
 void ResetTreeVariables(){
-  
 	for(int i = 0; i < maxhits; i++){
 		channel[i] = -1;	
 		adcEnergy[i] = -1;
 		time[i] = -1;
 	}
-  
 }
 
-//main method for CeBr3 analysis, looping through dumped data
+// Loop through dumped data
 int main(int argc, char *argv[]) {
-
-  //string output_dir = "/home/cridaq/analysis/UK_data/files/";
-  //string input_dir = "/home/cridaq/rootfiles/";
-  
-  //declare variables
+  // Declare variables
   string line,time,date;
   string data,junk,description;
   int linenum = 0;
   vector<string> vect;
   
-
-  //catch improper usage... probably should use the catch function but meh
+  // Error handling
+  // Further development: Use catch function
   if(argc != 3){
     cout << "Proper usage is: ./rootConvertPixieNet input_file output_file" << endl;
     exit(1);
@@ -89,7 +76,6 @@ int main(int argc, char *argv[]) {
   
   string fin_name = argv[1];
   string filename = GetFilename(fin_name);
-  //cout << filename << endl;
   string fout_name = argv[2];
   string outfilename = GetFilename(fout_name);
   string fin_extension = GetFileExtension(fin_name);
@@ -97,18 +83,13 @@ int main(int argc, char *argv[]) {
   
   //create output .root file with histograms
   cout<<"Making output root file"<<endl;
-  
-  //TFile *fout = new TFile(Form("%s%s.root",output_dir.c_str(),filename.c_str()),"RECREATE");
-  //cout << "Creating " << Form("%sUK_%s.root",output_dir.c_str(),filename.c_str()) << endl;
 
   TFile *fout = new TFile(fout_name.c_str(),"RECREATE");
-
   cout << "Creating " << fout_name.c_str() << endl;
 
 
-  //output TTree branches
-  //All variables declared in the header need to be added here if they are to be
-  //written to the output root file
+  // Output TTree branches
+  // All variables declared in the header need to be added here if they are to be written to the output root file
   TTree *tree1 = new TTree("data","data");
   tree1->Branch("eventHitCount",&eventHitCount,"eventHitCount/I");
   tree1->Branch("adcEnergy",&adcEnergy,"adcEnergy[eventHitCount]/I");
@@ -119,11 +100,13 @@ int main(int argc, char *argv[]) {
   TRandom3 *random3 = new TRandom3();
 
 
-  // *****************************************
-  //get the data
+  // ************
+  // Obtain data
+  // ************
 
-  //check for a binary file as input file
-  if(fin_extension.compare(".dat") == 0){ //input file is an ASCII file
+  // Check for binary input file
+  if(fin_extension.compare(".dat") == 0){ 
+    //input file is an ASCII file
     ifstream infile(fin_name.c_str());
     if(!infile){
       cout<< "Unable to Open File" << endl;
@@ -131,17 +114,20 @@ int main(int argc, char *argv[]) {
     else{
       cout << "File is Open" << endl;
 
-      //header junk = handle later
+      // Header information in raw data file 
+      // Handle later
       getline(infile,line);
       getline(infile,line);
       getline(infile,line);
 
-      //first real line
+      // First real line
       getline(infile,line);
       vect.clear();
       ResetTreeVariables();
 
+      // Comma delimiter
       split2(line,vect,',');
+
       //parse the line
       channel[0] = atoi(vect[1].c_str());
       adcEnergy[0] = atoi(vect[5].c_str());
