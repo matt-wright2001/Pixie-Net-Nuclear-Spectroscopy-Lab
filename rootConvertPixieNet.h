@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <vector>
 #include <stdlib.h>
+#include <cstddef>
 
 #include <TChain.h>
 #include <TTree.h>
@@ -18,10 +19,7 @@
 #include <TF1.h>
 #include <TF2.h>
 
-#include <cstddef>
-
 #include "math.h"
-
 #include "TRandom3.h"
 
 using namespace std;

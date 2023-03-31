@@ -128,17 +128,17 @@ int main(int argc, char *argv[]) {
       // Comma delimiter
       split2(line,vect,',');
 
-      //parse the line
+      // Parse line
       channel[0] = atoi(vect[1].c_str());
       adcEnergy[0] = atoi(vect[5].c_str());
       int time_h = atoi(vect[3].c_str());
       int time_l = atoi(vect[4].c_str());
       long time[0] = time_h * pow(2,32) + time_l;
 
-      //get new line
+      // Next line
       int counter = 0;
 	
-      // Group hits into events
+      // Group hits into event
       while(infile){
 	      getline(infile,line);
 	      vect.clear();
@@ -156,16 +156,18 @@ int main(int argc, char *argv[]) {
 	      } else{
 	          tree1->Fill();
 	          ResetTreeVariables();
-  	        counter=0;
+  	        counter = 0;
       	    adcEnergy[counter] = atoi(vect[5].c_str());
 	          channel[counter] = atoi(vect[1].c_str());
-	         time[counter] = time_temp;
+	          time[counter] = time_temp;
 	        }
         }
+      // Add event to tree
       tree1->Fill();
     }
   }
   
+  // Output tree for analysis
   tree1->Write();
   tree1->Print();
   
