@@ -1,3 +1,6 @@
+#ifndef ROOTCONVERTPIXIENET_H
+#define ROOTCONVERTPIXIENET_H
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -24,15 +27,16 @@
 using namespace std;
 
 // TTree variables
+const Int_t maxhits = 40;
+
+extern int adcEnergy[maxhits];
+extern long time[maxhits];
+extern int channel[maxhits];
+extern int eventHitCount;
+
+// 1000 ns event window
+const int eventMaxTime = 1000;
+
 void ResetTreeVariables();
-	const Int_t maxhits = 40;
 
-	int adcEnergy[maxhits];
-	long time[maxhits];
-	int channel[maxhits];
-	int eventHitCount;
-
-
-	// 1000 ns event window
-	const int eventMaxTime = 1000;
-
+#endif // ROOTCONVERTPIXIENET_H
