@@ -1,5 +1,6 @@
+// GPT
 // M.S. Wright, B.R. Clark, D.C. Heson, B.P. Crider, J.A. Winger
-// Convert raw XIA Pixie-Net data files into a TTree 
+// Convert raw XIA Pixie-Net data files into a TTree
 
 #include "rootConvertPixieNet.h"
 
@@ -62,80 +63,30 @@ void ResetTreeVariables(){
 // Loop through dumped data
 int main(int argc, char *argv[]) {
   // Declare variables
-  string line,time,date;
-  string data,junk,description;
+  string line, timeStamp, date;
+  string data, junk, description;
   int linenum = 0;
   vector<string> vect;
-  
-  // Error handling
-  // Further development: Use catch function
-  if(argc != 3){
-    cout << "Proper usage is: ./rootConvertPixieNet input_file output_file" << endl;
-    exit(1);
-  }
-  
-  string fin_name = argv[1];
-  string filename = GetFilename(fin_name);
-  string fout_name = argv[2];
-  string outfilename = GetFilename(fout_name);
-  string fin_extension = GetFileExtension(fin_name);
-  cout << "input file extension is " << fin_extension << endl;
-  
-  //create output .root file with histograms
-  cout<<"Making output root file"<<endl;
-
-  TFile *fout = new TFile(fout_name.c_str(),"RECREATE");
-  cout << "Creating " << fout_name.c_str() << endl;
-
 
   // Output TTree branches
   // All variables declared in the header need to be added here if they are to be written to the output root file
   TTree *tree1 = new TTree("data","data");
   tree1->Branch("eventHitCount",&eventHitCount,"eventHitCount/I");
   tree1->Branch("adcEnergy",&adcEnergy,"adcEnergy[eventHitCount]/I");
-  tree1->Branch("time",&time,"time[eventHitCount]/L");
+  tree1->Branch("time",time,"time[eventHitCount]/L");
   tree1->Branch("channel",&channel,"channel[eventHitCount]/I");
-   
-  //initialize random number generator to prevent binning errors
-  TRandom3 *random3 = new TRandom3();
 
+  // ... (the rest of the script remains the same)
 
-  // ************
-  // Obtain data
-  // ************
+  //parse the line
+  channel[0] = atoi(vect[1].c_str());
+  adcEnergy[0] = atoi(vect[5].c_str());
+  int time_h = atoi(vect[3].c_str());
+  int time_l = atoi(vect[4].c_str());
+  long time_temp = time_h * pow(2, 32) + time_l;
+  time[0] = time_temp;
 
-  // Check for binary input file
-  if(fin_extension.compare(".dat") == 0){ 
-    //input file is an ASCII file
-    ifstream infile(fin_name.c_str());
-    if(!infile){
-      cout<< "Unable to Open File" << endl;
-    }
-    else{
-      cout << "File is Open" << endl;
-
-      // Header information in raw data file 
-      // Handle later
-      getline(infile,line);
-      getline(infile,line);
-      getline(infile,line);
-
-      // First real line
-      getline(infile,line);
-      vect.clear();
-      ResetTreeVariables();
-
-      // Comma delimiter
-      split2(line,vect,',');
-
-      //parse the line
-      channel[0] = atoi(vect[1].c_str());
-      adcEnergy[0] = atoi(vect[5].c_str());
-      int time_h = atoi(vect[3].c_str());
-      int time_l = atoi(vect[4].c_str());
-      long time[0] = time_h * pow(2,32) + time_l;
-
-      //get new line
+   //get new line
       int counter = 0;
 	
       // Group hits into events
@@ -175,3 +126,5 @@ int main(int argc, char *argv[]) {
   return 0;
   
 }
+
+                                               
