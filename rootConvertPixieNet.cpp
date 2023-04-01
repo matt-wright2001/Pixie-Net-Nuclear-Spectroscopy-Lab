@@ -1,5 +1,24 @@
-// M.S. Wright, B.R. Clark, D.C. Heson, B.P. Crider, J.A. Winger
-// Convert raw XIA Pixie-Net data files into a TTree
+/******************************************************************************
+ * File: rootConvertPixieNet.cpp
+ * Author(s):
+ *      Student: M.S. Wright, B.R. Clark, D.C. Heson
+ *      Faculty Advisors: B.P. Crider, J.A. Winger
+ * Organization: Mississippi State University, Dept. of Physics and Astronomy 
+ * Date: April 1, 2023 
+ *
+ * Description:
+ * This program converts raw XIA Pixie-Net data files into a ROOT TTree format
+ * for nuclear spectroscopy data analysis and visualization. It is part of a
+ * senior class project led by students M.S. Wright, B.R. Clark, and D.C. Heson
+ * with guidance from Professors B.P. Crider and J.A. Winger.
+ *
+ * The program processes raw data from a .dat file acquired using the XIA Pixie-Net
+ * data acquisition module, groups hits into events based on their timestamps,
+ * and stores the processed data in a ROOT TTree format. The output file is saved
+ * with a .root extension, preserving the original filename. The resulting TTree
+ * can be used for further analysis, such as energy calibration, peak fitting, and
+ * visualization.
+ *****************************************************************************/
 
 #include "rootConvertPixieNet.h"
 
