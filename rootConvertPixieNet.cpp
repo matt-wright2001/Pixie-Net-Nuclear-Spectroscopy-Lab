@@ -1,4 +1,3 @@
-// GPT
 // M.S. Wright, B.R. Clark, D.C. Heson, B.P. Crider, J.A. Winger
 // Convert raw XIA Pixie-Net data files into a TTree
 
@@ -9,7 +8,6 @@ int adcEnergy[maxhits];
 long hitTime[maxhits];
 int channel[maxhits];
 int eventHitCount;
-
 
 using namespace std;
 
@@ -94,9 +92,6 @@ int main(int argc, char *argv[]) {
   tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L"); // Changed from 'time' to 'hitTime'
   tree1->Branch("channel", channel, "channel[eventHitCount]/I");
 
-  int counter_cout = 0; //counter for printing out stuff
-  int cout_lines = 20;
-
   // Process input file line by line  
   // Skip the first three lines (header information)
   getline(infile, line);
@@ -117,63 +112,34 @@ int main(int argc, char *argv[]) {
   hitTime[0] = time_temp;
 
   // Get new line
-  //int counter = 0;
   eventHitCount++;
 
   // Group hits into events
   while (infile) {
-    //cout << line << endl;
-    counter_cout++;
     vect.clear();
     split2(line, vect, ',');
 
     time_h = atoi(vect[3].c_str());
     time_l = atoi(vect[4].c_str());
     long time_temp = time_h * pow(2, 32) + time_l;
-    if(counter_cout < cout_lines){
-      cout << "time_temp = " << time_temp << ", time_h = " << time_h << ", time_l = " << time_l << endl;
-
-      cout << "eventMaxTime = " << eventMaxTime << ", hitTime[0] = " << hitTime[0] << endl;
-    }
 
     if (time_temp < (eventMaxTime + hitTime[0])) {
-      if(counter_cout < cout_lines){
-	cout << "in if..." << endl;
-      }
       eventHitCount++;
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
       channel[eventHitCount] = atoi(vect[1].c_str());
       hitTime[eventHitCount] = time_temp;
       
-    }else{
-      if(counter_cout < cout_lines){
-	cout << "in else..." << endl;
-      }
-      tree1->Fill();
-      //seeing what we have in the variables
-      for(int i = 0; i < eventHitCount; i++){
-	if(counter_cout < cout_lines){
-	  cout << "adcEnergy[" << i << "] = " << adcEnergy[i] << " ";
-	  cout << endl;
-	  cout << "channel[" << i << "] = " << channel[i] << ", ";
-	  cout << endl;
-	  cout << "hitTime[" << i << "] = " << hitTime[i] << ", ";
-	  cout << endl;
-	  cout << "eventHitCount = " << eventHitCount;
-	  cout << endl;
-	}
-      }
-      ResetTreeVariables();
-      adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-      channel[eventHitCount] = atoi(vect[1].c_str());
-      hitTime[eventHitCount] = time_temp;
-      eventHitCount++;
+    } else{
+    tree1->Fill();
+
+    ResetTreeVariables();
+    adcEnergy[eventHitCount] = atoi(vect[5].c_str());
+    channel[eventHitCount] = atoi(vect[1].c_str());
+    hitTime[eventHitCount] = time_temp;
+    eventHitCount++;
     }
     
     getline(infile, line);
-    if(counter_cout < cout_lines){
-      cout << line << endl;
-    }
   
   }
   //fill the last line

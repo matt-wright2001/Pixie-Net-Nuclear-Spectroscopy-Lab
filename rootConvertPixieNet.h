@@ -33,8 +33,8 @@ extern long hitTime[maxhits];
 extern int channel[maxhits];
 extern int eventHitCount;
 
-// 1000 ns event window
-const int eventMaxTime = 1000;
+// 10 microsecond event window
+const int eventMaxTime = 5000;
 
 // Function to reset tree variables
 void ResetTreeVariables();
