@@ -25,16 +25,19 @@
 using namespace std;
 
 // TTree variables
-const Int_t maxhits = 40;
+const int maxhits = 40;
 
+// Variables for each hit
 extern int adcEnergy[maxhits];
-extern long time[maxhits];
+extern long hitTime[maxhits];
 extern int channel[maxhits];
 extern int eventHitCount;
 
 // 1000 ns event window
 const int eventMaxTime = 1000;
 
+// Function to reset tree variables
 void ResetTreeVariables();
 
 #endif // ROOTCONVERTPIXIENET_H
+
