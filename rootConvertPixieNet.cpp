@@ -53,20 +53,25 @@ void ResetTreeVariables() {
     channel[i] = -1;
     adcEnergy[i] = -1;
     hitTime[i] = -1;
-    eventHitCount = 0;
   }
+  eventHitCount = 0;
 }
 
 // Main function
 int main(int argc, char *argv[]) {
   // Declare variables
-  string line, timeStamp, date;
-  string data, junk, description;
+  string line;
   vector<string> vect;
 
   // Check input arguments
   if (argc != 2) {
     cout << "Usage: " << argv[0] << " <input_file>" << endl;
+    return 1;
+  }
+
+  // Verify input file has the correct extension
+  if (GetFileExtension(argv[1]) != ".dat") {
+    cout << "Error: Invalid input file extension. Please provide a .dat file." << endl;
     return 1;
   }
 
@@ -89,60 +94,49 @@ int main(int argc, char *argv[]) {
   TTree *tree1 = new TTree("data", "data");
   tree1->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
   tree1->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
-  tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L"); // Changed from 'time' to 'hitTime'
+  tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
   tree1->Branch("channel", channel, "channel[eventHitCount]/I");
 
-  // Process input file line by line  
+  // Process input file line by line
   // Skip the first three lines (header information)
-  getline(infile, line);
-  getline(infile, line);
-  getline(infile, line);
-  
-  // Get the first line. Parse the line
-  getline(infile, line);
-  vect.clear();
-  split2(line, vect, ',');
-  cout << "first line = " << line << endl;
-  
-  channel[0] = atoi(vect[1].c_str());
-  adcEnergy[0] = atoi(vect[5].c_str());
-  unsigned int time_h = atoi(vect[3].c_str());
-  unsigned int time_l = atoi(vect[4].c_str());
-  long time_temp = time_h * pow(2, 32) + time_l;
-  hitTime[0] = time_temp;
+  for (int i = 0; i < 3; ++i) {
+    getline(infile, line);
+  }
 
-  // Get new line
-  eventHitCount++;
-
-  // Group hits into events
-  while (infile) {
+  // Loop through the input file
+  while (getline(infile, line)) {
     vect.clear();
     split2(line, vect, ',');
 
-    time_h = atoi(vect[3].c_str());
-    time_l = atoi(vect[4].c_str());
+    // Check for valid line format
+    if (vect.size() != 6) {
+      cerr << "Warning: Invalid line format: " << line << endl;
+      continue;
+    }
+
+    // Parse line content
+    unsigned int time_h = atoi(vect[3].c_str());
+    unsigned int time_l = atoi(vect[4].c_str());
     long time_temp = time_h * pow(2, 32) + time_l;
 
-    if (time_temp < (eventMaxTime + hitTime[0])) {
-      eventHitCount++;
+    // Group hits into events
+    if (time_temp < (eventMaxTime + hitTime[eventHitCount])) {
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
       channel[eventHitCount] = atoi(vect[1].c_str());
       hitTime[eventHitCount] = time_temp;
-      
-    } else{
-    tree1->Fill();
+      eventHitCount++;
+    } else {
+      tree1->Fill();
 
-    ResetTreeVariables();
-    adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-    channel[eventHitCount] = atoi(vect[1].c_str());
-    hitTime[eventHitCount] = time_temp;
-    eventHitCount++;
+      ResetTreeVariables();
+      adcEnergy[eventHitCount] = atoi(vect[5].c_str());
+      channel[eventHitCount] = atoi(vect[1].c_str());
+      hitTime[eventHitCount] = time_temp;
+      eventHitCount++;
     }
-    
-    getline(infile, line);
-  
   }
-  //fill the last line
+
+  // Fill the last event
   tree1->Fill();
 
   // Write, print, and close output file
@@ -150,7 +144,6 @@ int main(int argc, char *argv[]) {
   tree1->Print();
   fout->Write();
   fout->Close();
-  
+
   return 0;
 }
-
