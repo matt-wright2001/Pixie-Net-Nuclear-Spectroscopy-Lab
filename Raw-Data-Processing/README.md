@@ -1,7 +1,7 @@
 # rootConvertPixieNet
 
 ## Overview
-rootConvertPixieNet is used to convert raw data files produced by the XIA Pixie-Net into a ROOT TTree for further analysis and visualization. This program takes .dat files as input and outputs .root files. 
+rootConvertPixieNet is used to convert raw data files produced by the XIA Pixie-Net into a ROOT TTree for further analysis and visualization of nuclear spectroscopic data. This program takes .dat files as input and outputs .root files. 
 
 
 ## Usage
