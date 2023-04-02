@@ -1,7 +1,7 @@
 # Pixie-Net Nuclear Spectroscopy
 
 ## Overview
-This repository contains a user-friendly toolset designed to analyze data produced in Mississippi State University's (MSU) Department of Physics and Astronomy Intermediate/Advanced Laboratory Nuclear Spectroscopy experiment. Analysis tools include rootConvertPixieNet used to convert raw XIA Pixie-Net data files into a ROOT TTree format facilitating further analysis and visualization of nuclear spectroscopy data, ___ used to perform three dimensional Gaussian fits necessary for coincidence measurements, as well as prewritten BASH scripts to automate Pixie-Net operation. This work is part of a student class project supported by faculty advisors.
+This repository contains a user-friendly toolset designed to analyze data produced in Mississippi State University's (MSU) Department of Physics and Astronomy Intermediate/Advanced Laboratory Nuclear Spectroscopy experiment. Analysis tools include rootConvertPixieNet used to convert raw XIA Pixie-Net data files into a ROOT TTree format facilitating further analysis and visualization of nuclear spectroscopy data, NAMEOFPROGRAM used to perform three dimensional Gaussian fits necessary for coincidence measurements, as well as prewritten BASH scripts to automate Pixie-Net operation. This work is part of a student class project supported by faculty advisors.
 
 ## Author(s)
 - **Students**: M.S. Wright, B.R. Clark, D.C. Heson
