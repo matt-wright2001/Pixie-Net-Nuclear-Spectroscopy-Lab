@@ -1,7 +1,7 @@
 # rootConvertPixieNet
 
 ## Overview
-The `rootConvertPixieNet` tool is a user-friendly component of the Pixie-Net Nuclear Spectroscopy Toolkit designed to convert raw XIA Pixie-Net data files into a ROOT TTree format. This conversion facilitates further analysis and visualization of nuclear spectroscopy data. The tool is part of a senior class project led by students and supported by faculty advisors.
+The `rootConvertPixieNet` tool is a component of the Pixie-Net Nuclear Spectroscopy Toolkit designed to convert raw XIA Pixie-Net data files into a ROOT TTree format. Developed as part of a senior class project led by students and supported by faculty advisors, this conversion facilitates further analysis and visualization of nuclear spectroscopy data.
 
 ## Usage
 To use the `rootConvertPixieNet` tool, follow these steps:
@@ -14,9 +14,9 @@ $ make clean && make
 
 4. Execute the compiled program with your input .dat file as an argument:
 
-$ ./rootConvertPixieNet input.dat
+$ ./rootConvertPixieNet PixieNetOutput.dat
 
-The program will process the input file, convert the data into a ROOT TTree format, and save the output in a .root file with the same name as the input file.
+The program will process the input file, convert the data into a ROOT TTree format, and save the output in a .root file with the same name as the input file. In this case, that would be PixieNetOutput.root
 
 ## Output
 Upon successful execution, the `rootConvertPixieNet` tool will generate a .root file containing a TTree with the following branches:
@@ -28,3 +28,11 @@ Upon successful execution, the `rootConvertPixieNet` tool will generate a .root 
 
 These branches can be used for further analysis and visualization of the nuclear spectroscopy data using the ROOT framework.
 
+## Analysis
+Now that data has been stored as a TTree, histograms of branches may be drawn to analyze data collected with the Pixie-Net. This may be done from the command line during testing, but we recommend writing a macro to automate this process. plot.cpp is provided as an example macro.  From the ROOT command line, the following commands may be used to generate an adc energy spectrum.  Please note that this is an example.  More analysis should be performed to extract as much information about our sample as possible.
+
+$ TFile *_file0 = TFile::Open("PixieNetOutput.root")
+$ TTree *tree = (TTree *)_file0->Get("data")
+$ tree->Draw("adcEnergy[0]>>h1(Number of Bins, Start Bin, End Bin)", "", "")
+
+In the example, Number of Bins, Start Bin, and End Bin will all be numerical values.  Please note that in the second command, we are defining the pointer `tree` because my version of ROOT (and yours if you are using the MSU Advanced Lab's Manjaro machine) protects the name `data.`
