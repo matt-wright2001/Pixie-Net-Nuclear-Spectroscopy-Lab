@@ -32,7 +32,9 @@ These branches can be used for further analysis and visualization of the nuclear
 Now that data has been stored as a TTree, histograms of branches may be drawn to analyze data collected with the Pixie-Net. This may be done from the command line during testing, but we recommend writing a macro to automate this process. plot.cpp is provided as an example macro.  From the ROOT command line, the following commands may be used to generate an adc energy spectrum.  Please note that this is an example.  More analysis should be performed to extract as much information about our sample as possible.
 
 $ TFile *_file0 = TFile::Open("PixieNetOutput.root")
+
 $ TTree *tree = (TTree *)_file0->Get("data")
+
 $ tree->Draw("adcEnergy[0]>>h1(Number of Bins, Start Bin, End Bin)", "", "")
 
 In the example, Number of Bins, Start Bin, and End Bin will all be numerical values.  Please note that in the second command, we are defining the pointer `tree` because my version of ROOT (and yours if you are using the MSU Advanced Lab's Manjaro machine) protects the name `data.`

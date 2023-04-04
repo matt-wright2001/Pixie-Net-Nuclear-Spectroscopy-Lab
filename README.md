@@ -5,7 +5,7 @@ This repository contains a comprehensive toolset designed for analyzing data pro
 
 - `rootConvertPixieNet`: A program to convert raw XIA Pixie-Net data files into a ROOT TTree format, which facilitates further analysis and visualization of nuclear spectroscopy data.
 - `GaussianFitCoincidence`: A program to perform three-dimensional Gaussian fits necessary for coincidence measurements.
-- `Co60_Calibration`: A program used to correlate photon energies measured by the detector in adc units to MeV by perfroming a linear fit on Cobalt-60 peaks.  With the cobalt energy peaks known from the available literature, the adc output is calibrated to usable energy units.
+- `Co60_Calibration`: A program used to correlate photon energies measured by the detector in adc units to MeV by performing a linear fit on Cobalt-60 peaks.  With the cobalt energy peaks known from the available literature, the adc output is calibrated to usable energy units.
 - BASH scripts to automate Pixie-Net operation.
 
 This work is part of a student class project supported by faculty advisors.
