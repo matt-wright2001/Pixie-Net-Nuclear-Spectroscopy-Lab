@@ -110,11 +110,25 @@ int main(int argc, char *argv[]) {
   }
 
   // Output TTree branches
+  TTree *masterTree = new TTree("data", "data");
+  masterTree->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
+  masterTree->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
+  masterTree->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
+  masterTree->Branch("channel", channel, "channel[eventHitCount]/I");
+
+ 
+  TTree *tree0 = new TTree("data", "data");
+  tree0->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
+  tree0->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
+  tree0->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
+  tree0->Branch("channel", channel, "channel[eventHitCount]/I");
+
   TTree *tree1 = new TTree("data", "data");
   tree1->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
   tree1->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
   tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
   tree1->Branch("channel", channel, "channel[eventHitCount]/I");
+
 
   // Process input file line by line
   // Skip the first three lines (header information)
@@ -145,7 +159,17 @@ int main(int argc, char *argv[]) {
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     } else {
+
+    masterTree->Fill();
+
+    if (channel[eventHitCount]==0){
+      tree0->Fill();
+    }
+
+    if (channel[eventHitCount]==1){
       tree1->Fill();
+    }
+
 
       ResetTreeVariables();
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
@@ -156,11 +180,28 @@ int main(int argc, char *argv[]) {
   }
 
   // Fill the last event
-  tree1->Fill();
+  if (channel[eventHitCount]==0){
+    tree0->Fill();
+
+    // Write, print, and close output file
+    tree0->Write();
+    tree0->Print();
+    fout->Write();
+    fout->Close();
+  } else if (channel[eventHitCount]==1){
+    tree1->Fill();
+
+    // Write, print, and close output file
+    tree1->Write();
+    tree1->Print();
+    fout->Write();
+    fout->Close();
+  }
+  masterTree->Fill();
 
   // Write, print, and close output file
-  tree1->Write();
-  tree1->Print();
+  masterTree->Write();
+  masterTree->Print();
   fout->Write();
   fout->Close();
 
