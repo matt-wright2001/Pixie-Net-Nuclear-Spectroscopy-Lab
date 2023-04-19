@@ -31,54 +31,15 @@ int channelCount[4];
 
 using namespace std;
 
-// Function to strip the path and extension off of the filename
-string GetFilename(string filename) {
-  const size_t last_slash_idx = filename.find_last_of("\\/");
-  if (std::string::npos != last_slash_idx) {
-    filename.erase(0, last_slash_idx + 1);
-  }
+int main(int argc, char *argv[]);
 
-  const size_t period_idx = filename.rfind('.');
-  if (std::string::npos != period_idx) {
-    filename.erase(period_idx);
-  }
-  return filename;
-}
-
-// Function to get the file extension
-string GetFileExtension(string filename) {
-  const size_t last_slash_idx = filename.find_last_of("\\/");
-  if (std::string::npos != last_slash_idx) {
-    filename.erase(0, last_slash_idx + 1);
-  }
-
-  const size_t period_idx = filename.rfind('.');
-  std::string extension = filename.substr(period_idx, std::string::npos);
-  return extension;
-}
-
-// Function to split strings
+string GetFilename(string filename);
+string GetFileExtension(string filename);
 template <class Container>
-void split2(const std::string &str, Container &cont, char delim = ',') {
-  std::stringstream ss(str);
-  std::string token;
-  while (std::getline(ss, token, delim)) {
-    cont.push_back(token);
-  }
-}
+void split2(const std::string &str, Container &cont, char delim);
 
-// Function to reset tree variables
-void ResetTreeVariables() {
-  for (int i = 0; i < maxhits; i++) {
-    channel[i] = -1;
-    adcEnergy[i] = -1;
-    hitTime[i] = -1;
-  }
-  eventHitCount = 0;
-  for (int i = 0; i < 4; i++) {
-    channelCount[i] = 0;
-  }
-}
+void ResetTreeVariables();
+
 int main(int argc, char *argv[]) {
   // Declare variables
   string line;
@@ -203,5 +164,55 @@ int main(int argc, char *argv[]) {
   infile.close();
 
   return 0;
+}
+
+
+// Function to strip the path and extension off of the filename
+string GetFilename(string filename) {
+  const size_t last_slash_idx = filename.find_last_of("\\/");
+  if (std::string::npos != last_slash_idx) {
+    filename.erase(0, last_slash_idx + 1);
+  }
+
+  const size_t period_idx = filename.rfind('.');
+  if (std::string::npos != period_idx) {
+    filename.erase(period_idx);
+  }
+  return filename;
+}
+
+// Function to get the file extension
+string GetFileExtension(string filename) {
+  const size_t last_slash_idx = filename.find_last_of("\\/");
+  if (std::string::npos != last_slash_idx) {
+    filename.erase(0, last_slash_idx + 1);
+  }
+
+  const size_t period_idx = filename.rfind('.');
+  std::string extension = filename.substr(period_idx, std::string::npos);
+  return extension;
+}
+
+// Function to split strings
+template <class Container>
+void split2(const std::string &str, Container &cont, char delim) {
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, delim)) {
+    cont.push_back(token);
+  }
+}
+
+// Function to reset tree variables
+void ResetTreeVariables() {
+  for (int i = 0; i < maxhits; i++) {
+    channel[i] = -1;
+    adcEnergy[i] = -1;
+    hitTime[i] = -1;
+  }
+  eventHitCount = 0;
+  for (int i = 0; i < 4; i++) {
+    channelCount[i] = 0;
+  }
 }
 

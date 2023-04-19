@@ -33,7 +33,11 @@ extern long hitTime[maxhits];
 extern int channel[maxhits];
 extern int eventHitCount;
 
-// Function to reset tree variables
+// Function prototypes
+string GetFilename(string filename);
+string GetFileExtension(string filename);
+template <class Container>
+void split2(const std::string &str, Container &cont, char delim = ',');
 void ResetTreeVariables();
 
 #endif // ROOTCONVERTPIXIENET_H
