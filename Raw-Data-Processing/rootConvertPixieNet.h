@@ -4,9 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <stdio.h>
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstddef>
 
 #include <TChain.h>
@@ -24,17 +23,15 @@
 
 using namespace std;
 
-// TTree variables
-const int maxhits = 40;
+// Constants
+const int maxhits = 40; // Maximum number of hits allowed per event
+const int eventMaxTime = 5000; // 10 microsecond event window
 
 // Variables for each hit
 extern int adcEnergy[maxhits];
 extern long hitTime[maxhits];
 extern int channel[maxhits];
 extern int eventHitCount;
-
-// 10 microsecond event window
-const int eventMaxTime = 5000;
 
 // Function to reset tree variables
 void ResetTreeVariables();

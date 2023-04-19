@@ -1,10 +1,10 @@
 /******************************************************************************
  * File: rootConvertPixieNet.cpp
  * Author(s):
- *      Student: M.S. Wright, B.R. Clark, D.C. Heson
+ *      Students: M.S. Wright, B.R. Clark, D.C. Heson
  *      Faculty Advisors: B.P. Crider, J.A. Winger
- * Organization: Mississippi State University, Dept. of Physics and Astronomy 
- * Date: April 1, 2023 
+ * Organization: Mississippi State University, Dept. of Physics and Astronomy
+ * Date: April 19, 2023
  *
  * Description:
  * This program converts raw XIA Pixie-Net data files into a ROOT TTree format
@@ -27,6 +27,7 @@ int adcEnergy[maxhits];
 long hitTime[maxhits];
 int channel[maxhits];
 int eventHitCount;
+int channelCount[4];
 
 using namespace std;
 
@@ -58,7 +59,7 @@ string GetFileExtension(string filename) {
 
 // Function to split strings
 template <class Container>
-void split2(const std::string &str, Container &cont, char delim = '\t') {
+void split2(const std::string &str, Container &cont, char delim = ',') {
   std::stringstream ss(str);
   std::string token;
   while (std::getline(ss, token, delim)) {
@@ -74,9 +75,10 @@ void ResetTreeVariables() {
     hitTime[i] = -1;
   }
   eventHitCount = 0;
+  for (int i = 0; i < 4; i++) {
+    channelCount[i] = 0;
+  }
 }
-
-// Main function
 int main(int argc, char *argv[]) {
   // Declare variables
   string line;
@@ -110,11 +112,22 @@ int main(int argc, char *argv[]) {
   }
 
   // Output TTree branches
-  TTree *tree1 = new TTree("data", "data");
-  tree1->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
-  tree1->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
-  tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
-  tree1->Branch("channel", channel, "channel[eventHitCount]/I");
+  TTree *masterTree = new TTree("data", "Master Data Tree");
+  masterTree->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
+  masterTree->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
+  masterTree->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
+  masterTree->Branch("channel", channel, "channel[eventHitCount]/I");
+
+  TTree *channelTrees[4];
+  for (int i = 0; i < 4; i++) {
+    string treeName = "channel" + to_string(i);
+    string treeTitle = "Channel " + to_string(i) + " Data Tree";
+    channelTrees[i] = new TTree(treeName.c_str(), treeTitle.c_str());
+    channelTrees[i]->Branch("eventHitCount", &channelCount[i], "eventHitCount/I");
+    channelTrees[i]->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
+    channelTrees[i]->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
+    channelTrees[i]->Branch("channel", channel, "channel[eventHitCount]/I");
+  }
 
   // Process input file line by line
   // Skip the first three lines (header information)
@@ -125,7 +138,7 @@ int main(int argc, char *argv[]) {
   // Loop through the input file
   while (getline(infile, line)) {
     vect.clear();
-    split2(line, vect, ',');
+    split2(line, vect);
 
     // Check for valid line format
     if (vect.size() != 6) {
@@ -133,36 +146,62 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // Parse line content
+       // Parse line content
     unsigned int time_h = atoi(vect[3].c_str());
     unsigned int time_l = atoi(vect[4].c_str());
     long time_temp = time_h * pow(2, 32) + time_l;
 
     // Group hits into events
     if (time_temp < (eventMaxTime + hitTime[eventHitCount])) {
+      int ch = atoi(vect[1].c_str());
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-      channel[eventHitCount] = atoi(vect[1].c_str());
+      channel[eventHitCount] = ch;
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     } else {
-      tree1->Fill();
+      masterTree->Fill();
+      for (int i = 0; i < eventHitCount; i++) {
+        int ch = channel[i];
+        channelCount[ch] = 1;
+        adcEnergy[0] = adcEnergy[i];
+        hitTime[0] = hitTime[i];
+        channelTrees[ch]->Fill();
+        channelCount[ch] = 0;
+      }
 
       ResetTreeVariables();
+      int ch = atoi(vect[1].c_str());
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-      channel[eventHitCount] = atoi(vect[1].c_str());
+      channel[eventHitCount] = ch;
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     }
   }
 
   // Fill the last event
-  tree1->Fill();
+  masterTree->Fill();
+  for (int i = 0; i < eventHitCount; i++) {
+    int ch = channel[i];
+    channelCount[ch] = 1;
+    adcEnergy[0] = adcEnergy[i];
+    hitTime[0] = hitTime[i];
+    channelTrees[ch]->Fill();
+    channelCount[ch] = 0;
+  }
 
   // Write, print, and close output file
-  tree1->Write();
-  tree1->Print();
-  fout->Write();
+  fout->cd();
+  masterTree->Write();
+  masterTree->Print();
+  for (int i = 0; i < 4; i++) {
+    channelTrees[i]->Write();
+    channelTrees[i]->Print();
+  }
   fout->Close();
+
+  // Close input file
+  infile.close();
 
   return 0;
 }
+
