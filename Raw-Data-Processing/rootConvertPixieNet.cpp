@@ -24,6 +24,7 @@
 
 // Define external variables
 int adcEnergy[maxhits];
+int Ecal[maxhits];
 long hitTime[maxhits];
 int channel[maxhits];
 int eventHitCount;
@@ -71,6 +72,7 @@ void ResetTreeVariables() {
   for (int i = 0; i < maxhits; i++) {
     channel[i] = -1;
     adcEnergy[i] = -1;
+    Ecal[i] = -1;
     hitTime[i] = -1;
   }
   eventHitCount = 0;
@@ -82,6 +84,43 @@ int main(int argc, char *argv[]) {
   string line;
   vector<string> vect;
 
+  // Read in the line values to calibrate each channel
+  ifstream calFile("calibration.dat");
+  if (!calFile){
+    cerr << "Error: file could not be opened" << endl;
+    exit(1);
+  }
+  
+  float channel[2];
+  float energy[2];
+  float slope[4];
+  float yint[4];
+  float num;
+  string filler;
+
+  getline(calFile, filler);
+  filler.clear();
+  getline(calFile, filler);
+  filler.clear();
+
+  // Read the file and calculate the slopes and y intercepts for each channel
+  for (int i = 0; i < 4; i++){
+    calFile >> num;
+    calFile >> num;
+    channel[0] = num;
+    calFile >> num;
+    energy[0] = num;
+    calFile >> num;
+    calFile >> num;
+    channel[1] = num;
+    calFile >> num;
+    energy[1] = num;
+    slope[i] = ((energy[1]-energy[0])/(channel[1] - channel[0]));
+    yint[i] = energy[0] - slope[i]*channel[0];
+    cout << slope[i] << " " << yint[i] << endl;
+  }
+  
+  
   // Check input arguments
   if (argc != 2) {
     cout << "Usage: " << argv[0] << " <input_file>" << endl;
@@ -113,17 +152,21 @@ int main(int argc, char *argv[]) {
   TTree *tree1 = new TTree("data", "data");
   tree1->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
   tree1->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
+  tree1->Branch("Ecal", Ecal, "Ecal[eventHitCount]/I");
   tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
   tree1->Branch("channel", channel, "channel[eventHitCount]/I");
 
+  
   // Process input file line by line
   // Skip the first three lines (header information)
   for (int i = 0; i < 3; ++i) {
     getline(infile, line);
   }
 
+  int filecounter = 0;
   // Loop through the input file
   while (getline(infile, line)) {
+    filecounter++;
     vect.clear();
     split2(line, vect, ',');
 
@@ -139,9 +182,11 @@ int main(int argc, char *argv[]) {
     long time_temp = time_h * pow(2, 32) + time_l;
 
     // Group hits into events
-    if (time_temp < (eventMaxTime + hitTime[eventHitCount])) {
+    if (time_temp < (eventMaxTime + hitTime[0])) {
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
       channel[eventHitCount] = atoi(vect[1].c_str());
+      //use the appropriate slope and yintercept for the channel to calibrate
+      Ecal[eventHitCount] = int(adcEnergy[eventHitCount]*slope[atoi(vect[1].c_str())] + yint[atoi(vect[1].c_str())]);
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     } else {
@@ -150,6 +195,7 @@ int main(int argc, char *argv[]) {
       ResetTreeVariables();
       adcEnergy[eventHitCount] = atoi(vect[5].c_str());
       channel[eventHitCount] = atoi(vect[1].c_str());
+      Ecal[eventHitCount] = int(adcEnergy[eventHitCount]*slope[atoi(vect[1].c_str())] + yint[atoi(vect[1].c_str())]);
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     }

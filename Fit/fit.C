@@ -3,6 +3,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TRandom.h"
+#include <iostream>
 
 using namespace std;
 
@@ -10,37 +11,58 @@ using namespace std;
 // This macro to read data from an ascii file and
 // create a root file with a TTree
 void fit(){
+  int maxchannels = 4;
+  TFile *hfile = hfile = TFile::Open("coincidence.root");
+
+  TTree *tree1 = (TTree*)hfile->Get("data");
+
+  const int events = tree1->GetEntries();
+
   const int maxhits = 40;
   int adcEnergy[maxhits];
   Long64_t hitTime[maxhits];
   int channel[maxhits];
   int eventHitCount;
-
-  TFile *hfile = hfile = TFile::Open("False_Coincidence.root");
-
-  TTree *tree = (TTree*)hfile->Get("data");
-
-  tree->SetBranchAddress("adcEnergy", adcEnergy);
-  tree->SetBranchAddress("hitTime", hitTime);
-  tree->SetBranchAddress("channel", channel);
-  tree->SetBranchAddress("eventHitCount", &eventHitCount);
+  int Eadc0entries[events];
+  int Eadc1entries[events];
+  
+  tree1->SetBranchAddress("adcEnergy", adcEnergy);
+  tree1->SetBranchAddress("hitTime", hitTime);
+  tree1->SetBranchAddress("channel", channel);
+  tree1->SetBranchAddress("eventHitCount", &eventHitCount);
 
   TFile *f = new TFile("histogram.root", "RECREATE");
 
-  TH1F *Eadc = new TH1F("Eadc", "adcEnergy vs. counts", 700, 0, 7000);
-  TH1F *hTime = new TH1F("hTime", "hitTime vs. counts", 3500000000, 0, 350000000000);
-  TH1F *chan = new TH1F("chan", "channel vs. counts", 4, 0, 4);
-  TH1F *eventhitCt = new TH1F("eventhitCt", "eventhitCount vs. counts", 2, 0, 2);
+  TH1F *Eadc0 = new TH1F("Eadc_chan0", "adcEnergy vs. counts", 700, 0, 7000);
+  TH1F *Eadc1 = new TH1F("Eadc_chan1", "channel vs. counts", 700, 0, 7000);
+  TH2F *Eadc2d = new TH2F("Eadc_2d", "eventhitCount vs. counts", 700, 0, 7000, 700, 0, 7000);
 
-  for (int i =0; i<maxhits; i++){
-    Eadc->Fill(adcEnergy[i]);
-    hTime->Fill(hitTime[i]);
-    chan->Fill(channel[i]);
+  //fill 1d histograms
+  for (int i =0; i<events; i++){
+    tree1->GetEntry(i);
+    for (int j = 0; j<eventHitCount; j++){
+      if (channel[j] == 0){
+	Eadc0->Fill(adcEnergy[j]);
+	//	Eadc0entries[i] = adcEnergy;
+      }
+      if (channel[j] == 1){
+	Eadc1->Fill(adcEnergy[j]);
+	//	Eadc1entries[i] = adcEnergy;
+      }
+    }
+    //filling 2d histograms
+    for(int j = 0; j< eventHitCount; j++){
+      if(adcEnergy[j] >10){
+	for(int k= j+1; k <eventHitCount; k++){
+	  if(adcEnergy[k] >10){
+	    Eadc2d->Fill(adcEnergy[j], adcEnergy[k]);
+	  }
+	}
+      }
+    }
   }
-  eventhitCt->Fill(eventHitCount);
-
-  Eadc->Write();
-  hTime->Write();
-  chan->Write();
-  eventhitCt->Write();
+  
+  Eadc0->Write();
+  Eadc1->Write();
+  Eadc2d->Write("colz");
 }
