@@ -93,7 +93,18 @@ void fit(){
   Ecal1->Write();
   Ecal2d->Write();
   if (answer == "y"){
+    Ecal2d->SetTitle("Co-60 Coincidences");
+    Ecal2d->GetXaxis()->SetTitle("Photon Energies Measured in Detector 1 (MeV)");
+    Ecal2d->GetYaxis()->SetTitle("Photon Energies Measured in Detector 2 (MeV)");
     Ecal2d->Draw();
   }
+
+  gStyle->SetOptStat(0);
+  
+  Ecal0->GetXaxis()->SetTitle("Photon Energy (MeV)");
+  Ecal0->GetYaxis()->SetTitle("Measured Counts");
+  Ecal0->SetTitle("Mn-54");
+
+  Ecal0->Draw();
   
 }
