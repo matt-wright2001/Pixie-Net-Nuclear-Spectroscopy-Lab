@@ -24,7 +24,7 @@
 
 // Define external variables
 int adcEnergy[maxhits];
-int Ecal[maxhits];
+double Ecal[maxhits];
 long hitTime[maxhits];
 int channel[maxhits];
 int eventHitCount;
@@ -87,11 +87,11 @@ int main(int argc, char *argv[]) {
   // Read in the line values to calibrate each channel
   ifstream calFile("calibration.dat");
   if (!calFile){
-    cerr << "Error: file could not be opened" << endl;
+    cerr << "Error: calibration.dat could not be opened" << endl;
     exit(1);
   }
   
-  float channel[2];
+  float channelnum[2];
   float energy[2];
   float slope[4];
   float yint[4];
@@ -107,16 +107,16 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < 4; i++){
     calFile >> num;
     calFile >> num;
-    channel[0] = num;
-    calFile >> num;
     energy[0] = num;
     calFile >> num;
+    channelnum[0] = num;
     calFile >> num;
-    channel[1] = num;
     calFile >> num;
     energy[1] = num;
-    slope[i] = ((energy[1]-energy[0])/(channel[1] - channel[0]));
-    yint[i] = energy[0] - slope[i]*channel[0];
+    calFile >> num;
+    channelnum[1] = num;
+    slope[i] = ((energy[1]-energy[0])/(channelnum[1] - channelnum[0]));
+    yint[i] = energy[0] - slope[i]*channelnum[0];
     cout << slope[i] << " " << yint[i] << endl;
   }
   
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
   TTree *tree1 = new TTree("data", "data");
   tree1->Branch("eventHitCount", &eventHitCount, "eventHitCount/I");
   tree1->Branch("adcEnergy", adcEnergy, "adcEnergy[eventHitCount]/I");
-  tree1->Branch("Ecal", Ecal, "Ecal[eventHitCount]/I");
+  tree1->Branch("Ecal", Ecal, "Ecal[eventHitCount]/D");
   tree1->Branch("hitTime", hitTime, "hitTime[eventHitCount]/L");
   tree1->Branch("channel", channel, "channel[eventHitCount]/I");
 
@@ -183,19 +183,19 @@ int main(int argc, char *argv[]) {
 
     // Group hits into events
     if (time_temp < (eventMaxTime + hitTime[0])) {
-      adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-      channel[eventHitCount] = atoi(vect[1].c_str());
+      adcEnergy[eventHitCount] = (int)atoi(vect[5].c_str());
+      channel[eventHitCount] = (int)atoi(vect[1].c_str());
       //use the appropriate slope and yintercept for the channel to calibrate
-      Ecal[eventHitCount] = int(adcEnergy[eventHitCount]*slope[atoi(vect[1].c_str())] + yint[atoi(vect[1].c_str())]);
+      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]];
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     } else {
       tree1->Fill();
 
       ResetTreeVariables();
-      adcEnergy[eventHitCount] = atoi(vect[5].c_str());
-      channel[eventHitCount] = atoi(vect[1].c_str());
-      Ecal[eventHitCount] = int(adcEnergy[eventHitCount]*slope[atoi(vect[1].c_str())] + yint[atoi(vect[1].c_str())]);
+      adcEnergy[eventHitCount] = (int)atoi(vect[5].c_str());
+      channel[eventHitCount] = (int)atoi(vect[1].c_str());
+      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]];
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     }
