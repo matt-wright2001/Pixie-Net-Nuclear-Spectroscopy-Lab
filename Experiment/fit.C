@@ -93,6 +93,7 @@ void fit(){
   Ecal1->Write();
   Ecal2d->Write();
   if (answer == "y"){
-  Ecal2d->Draw();
+    Ecal2d->Draw();
   }
+  
 }
