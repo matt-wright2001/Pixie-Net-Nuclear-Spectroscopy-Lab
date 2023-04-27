@@ -3,6 +3,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TRandom.h"
+#include <string>
 #include <iostream>
 
 using namespace std;
@@ -12,7 +13,20 @@ using namespace std;
 // create a root file with a TTree
 void fit(){
   int maxchannels = 4;
-  TFile *hfile = hfile = TFile::Open("coincidence.root");
+
+  string filename;
+  cout << "Which root file would you like to make histograms of?" << endl;
+  getline(cin, filename);
+
+  TFile *hfile = TFile::Open(filename.c_str());
+  if (!hfile) {
+    cout << "Error: could not open file " << filename << endl;
+    return 1;
+  }
+
+  string answer;
+  cout << "Would you like to draw a 2d histogram? (enter y or n)" << endl;
+  getline(cin, answer);
 
   TTree *tree1 = (TTree*)hfile->Get("data");
 
@@ -78,4 +92,7 @@ void fit(){
   Ecal0->Write();
   Ecal1->Write();
   Ecal2d->Write();
+  if (answer == "y"){
+  Ecal2d->Draw();
+  }
 }
