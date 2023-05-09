@@ -49,13 +49,13 @@ void fit(){
 
   TFile *f = new TFile("histogram.root", "RECREATE");
 
-  TH1D *Eadc0 = new TH1D("Eadc_chan0", "adcEnergy vs. counts", 700, 0, 7000);
-  TH1D *Eadc1 = new TH1D("Eadc_chan1", "channel vs. counts", 700, 0, 7000);
-  TH2D *Eadc2d = new TH2D("Eadc_2d", "eventhitCount vs. counts", 700, 0, 7000, 700, 0, 7000);
+  TH1D *Eadc0 = new TH1D("Eadc_chan0", "adcEnergy vs. counts", 500, 0, 5000);
+  TH1D *Eadc1 = new TH1D("Eadc_chan1", "channel vs. counts", 500, 0, 5000);
+  TH2D *Eadc2d = new TH2D("Eadc_2d", "eventhitCount vs. counts", 500, 0, 5000, 250, 0, 5000);
 
-  TH1D *Ecal0 = new TH1D("Ecal_chan0", "calEnergy vs. counts", 1000, 0, 4000);
-  TH1D *Ecal1 = new TH1D("Ecal_chan1", "channel vs. counts", 1000, 0, 4000);
-  TH2D *Ecal2d = new TH2D("Ecal_2d", "eventhitCount vs. counts", 1000, 0, 4000, 1000, 0, 4000);
+  TH1D *Ecal0 = new TH1D("Ecal_chan0", "calEnergy vs. counts", 400, 0, 4000);
+  TH1D *Ecal1 = new TH1D("Ecal_chan1", "channel vs. counts", 400, 0, 4000);
+  TH2D *Ecal2d = new TH2D("Ecal_2d", "eventhitCount vs. counts", 400, 0, 4000, 400, 0, 4000);
 
   //fill 1d histograms
   for (int i =0; i<events; i++){
