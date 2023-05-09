@@ -26,7 +26,6 @@
 #include <TGraph.h>
 #include <TMath.h>
 #include <vector>
-#include <random>
 
 
 // Define external variables
@@ -109,9 +108,9 @@ void fitGraphs(TGraph* grArray[4]) {
 
         // Get the fit parameters and their errors
         double param0 = func->GetParameter(0);
+	slope[i] = param0;
         double param1 = func->GetParameter(1);
-	slope[i] = param1;
-	yint[i] = param0;
+	yint[i] = param1;
         double param0Err = func->GetParError(0);
         double param1Err = func->GetParError(1);
 
@@ -262,7 +261,7 @@ fitGraphs(grArray);
       adcEnergy[eventHitCount] = (int)atoi(vect[5].c_str());
       channel[eventHitCount] = (int)atoi(vect[1].c_str());
       //use the appropriate slope and yintercept for the channel to calibrate
-      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]];
+      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]] + double rand_num = static_cast<double>(std::rand()) / static_cast<double>(1);
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     } else {
@@ -271,7 +270,7 @@ fitGraphs(grArray);
       ResetTreeVariables();
       adcEnergy[eventHitCount] = (int)atoi(vect[5].c_str());
       channel[eventHitCount] = (int)atoi(vect[1].c_str());
-      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]];
+      Ecal[eventHitCount] = adcEnergy[eventHitCount]*slope[channel[eventHitCount]] + yint[channel[eventHitCount]] double rand_num = static_cast<double>(std::rand()) / static_cast<double>(1);
       hitTime[eventHitCount] = time_temp;
       eventHitCount++;
     }

@@ -63,12 +63,12 @@ void fit(){
     for (int j = 0; j<eventHitCount; j++){
       if (channel[j] == 0){
 	Eadc0->Fill(adcEnergy[j]);	
-	Ecal0->Fill(Ecal[j] +rand()%1);
+	Ecal0->Fill(Ecal[j]);
 	//	Eadc0entries[i] = adcEnergy;
       }
       if (channel[j] == 1){
 	Eadc1->Fill(adcEnergy[j]);
-	Ecal1->Fill(Ecal[j]+rand()%1);
+	Ecal1->Fill(Ecal[j]);
 	//	Eadc1entries[i] = adcEnergy;
       }
     }
@@ -78,7 +78,7 @@ void fit(){
 	for(int k= j+1; k <eventHitCount; k++){
 	  if(adcEnergy[k] >10){
 	    Eadc2d->Fill(adcEnergy[j], adcEnergy[k]);
-	    Ecal2d->Fill(Ecal[j]+rand()%1, Ecal[k]+rand()%1);
+	    Ecal2d->Fill(Ecal[j], Ecal[k]);
 	  }
 	}
       }
@@ -98,5 +98,30 @@ void fit(){
     Ecal2d->GetYaxis()->SetTitle("Photon Energies Measured in Detector 2 (MeV)");
     Ecal2d->Draw();
   }
+  
+
+gStyle->SetOptStat(0);
+
+
+// Set the title to be placed inside the plot's window
+gStyle->SetTitleX(0.5);
+gStyle->SetTitleY(0.9);
+
+Eadc0->GetXaxis()->SetLabelFont(132);
+Eadc0->GetYaxis()->SetLabelFont(132);
+Eadc0->SetTitle("");
+
+Eadc0->Draw();
+
+TLatex latex;
+latex.SetTextFont(132);
+latex.SetTextSize(0.04);
+
+latex.DrawLatexNDC(0.5, 0.8, "Background"); // Title
+latex.DrawLatexNDC(0.5, 0.01, "Photon Energy (MeV)"); // X-axis label
+
+latex.SetTextAngle(90);
+latex.DrawLatexNDC(0.03, 0.5, "Measured Counts"); // Y-axis label, rotated vertically
+
 
 }
